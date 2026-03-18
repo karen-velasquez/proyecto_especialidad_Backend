@@ -4,9 +4,15 @@ const userSchema = new mongoose.Schema({
   name: String,
   email: {
     type: String,
-    unique: true
+    unique: true,
+    required: true,
+    match: [/.+\@.+\..+/, "Por favor ingrese un correo válido"] // Validación básica de regex
   },
-  password: String,
+  password: {
+    type: String,
+    required: true,
+    select: false // 🛡️ Seguridad: No devolver la contraseña por defecto en las consultas
+  },
   role: {
     type: String,
     default: "user"
