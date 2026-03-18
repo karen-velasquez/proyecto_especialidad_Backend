@@ -96,7 +96,29 @@ Node.js + Express API
               (OpenCV / PyTorch)
 ```
 
----
+
+# Clean Architecture
+
+El proyecto busca alinearse con los principios de **Clean Architecture** para lograr una separación clara de responsabilidades y facilitar la escalabilidad y el mantenimiento. La estructura propuesta es:
+
+```
+src/
+  controllers/   # Adaptadores de entrada/salida (HTTP, Express)
+  routes/        # Definición de endpoints y rutas
+  services/      # Casos de uso y lógica de negocio
+  models/        # Entidades y modelos de dominio
+  repositories/  # Interfaces y acceso a datos (MongoDB, etc.)
+  middlewares/   # Middlewares de Express
+  config/        # Configuración de la app
+```
+
+**Principios clave:**
+- Los controladores solo orquestan la petición y delegan la lógica a los servicios/casos de uso.
+- Los servicios contienen la lógica de negocio y no dependen de Express ni de la base de datos.
+- Los modelos representan las entidades del dominio.
+- Los repositorios abstraen el acceso a datos y pueden tener distintas implementaciones.
+
+Esta arquitectura permite desacoplar la lógica de negocio de la infraestructura y facilita la realización de pruebas, cambios tecnológicos y escalabilidad.
 
 # Entidades principales
 
