@@ -6,6 +6,9 @@ const Dog = require('../models/dog.model');
 
 class DogRepository {
   async create(dogData) {
+    if (!dogData.esterilizado) {
+      dogData.codigoEsterilizacion = null;
+    }
     const dog = new Dog(dogData);
     return await dog.save();
   }
