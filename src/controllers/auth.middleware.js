@@ -19,12 +19,10 @@ const protect = async (req, res, next) => {
       next(); // Continuar a la siguiente función (el controlador)
     } catch (error) {
       console.error(error);
-      res.status(401).json({ message: "No autorizado, token fallido" });
+      return res.status(401).json({ message: "No autorizado, token fallido" });
     }
-  }
-
-  if (!token) {
-    res.status(401).json({ message: "No autorizado, no hay token" });
+  } else {
+    return res.status(401).json({ message: "No autorizado, no hay token" });
   }
 };
 

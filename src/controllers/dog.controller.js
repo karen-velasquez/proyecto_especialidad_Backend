@@ -3,10 +3,8 @@ const dogService = require('../services/dog.service');
 
 const registerDog = async (req, res) => {
   try {
-    const { name, breed, age, owner } = req.body; // owner ahora viene en el body
-    if (!owner) {
-      return res.status(400).json({ error: 'El campo owner es obligatorio (id del usuario)' });
-    }
+    const { name, breed, age } = req.body;
+    const owner = req.user._id; // owner viene del token autenticado
     const dog = await dogService.register({ name, breed, age, owner });
     res.status(201).json({ message: 'Perro registrado correctamente', dog });
   } catch (error) {

@@ -1,6 +1,3 @@
-  async listByOwner(ownerId) {
-    return await dogRepository.findByOwner(ownerId);
-  }
 // src/services/dog.service.js
 // Lógica de negocio para perros
 
@@ -17,6 +14,10 @@ class DogService {
 
   async findById(id) {
     return await dogRepository.findById(id);
+  }
+
+  async listByOwner(ownerId) {
+    return await dogRepository.findByOwner(ownerId);
   }
 }
 

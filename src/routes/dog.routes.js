@@ -1,11 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const { registerDog, listDogs } = require('../controllers/dog.controller');
-// const authMiddleware = require('../middlewares/auth'); // Descomentar cuando implementes autenticación
+const { protect } = require('../controllers/auth.middleware');
 
-// router.use(authMiddleware); // Proteger rutas
-
-router.post('/', registerDog);
-router.get('/', listDogs);
+router.post('/', protect, registerDog);
+router.get('/', protect, listDogs);
 
 module.exports = router;
