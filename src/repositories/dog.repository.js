@@ -1,3 +1,6 @@
+  async findByOwner(ownerId) {
+    return await Dog.find({ owner: ownerId }).populate('owner');
+  }
 // src/repositories/dog.repository.js
 // Abstracción del acceso a datos para perros
 

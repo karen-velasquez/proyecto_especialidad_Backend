@@ -3,6 +3,7 @@
 
 const User = require('../models/user.model');
 
+
 class UserRepository {
   async create(userData) {
     const user = new User(userData);
@@ -13,7 +14,9 @@ class UserRepository {
     return await User.findOne({ email }).select('+password');
   }
 
-  // Otros métodos de acceso a datos pueden agregarse aquí
+  async findAll() {
+    return await User.find();
+  }
 }
 
 module.exports = new UserRepository();

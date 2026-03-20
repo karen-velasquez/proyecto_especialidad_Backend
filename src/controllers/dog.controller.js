@@ -3,9 +3,10 @@ const dogService = require('../services/dog.service');
 
 const registerDog = async (req, res) => {
   try {
-    const { name, breed, age } = req.body;
-    // El owner debe obtenerse del usuario autenticado (req.user.id)
-    const owner = req.user.id;
+    const { name, breed, age, owner } = req.body; // owner ahora viene en el body
+    if (!owner) {
+      return res.status(400).json({ error: 'El campo owner es obligatorio (id del usuario)' });
+    }
     const dog = await dogService.register({ name, breed, age, owner });
     res.status(201).json({ message: 'Perro registrado correctamente', dog });
   } catch (error) {
@@ -15,7 +16,12 @@ const registerDog = async (req, res) => {
 
 const listDogs = async (req, res) => {
   try {
-    const dogs = await dogService.list();
+    // Solo listar perros cuyo owner sea el usuario autenticado
+    const ownerId = req.user?._id;
+    if (!ownerId) {
+      return res.status(401).json({ error: 'No autorizado, usuario no autenticado' });
+    }
+    const dogs = await dogService.listByOwner(ownerId);
     res.json(dogs);
   } catch (error) {
     res.status(500).json({ error: error.message });
