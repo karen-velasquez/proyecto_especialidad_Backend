@@ -1,18 +1,23 @@
 // src/services/user.service.js
-// Lógica de negocio para usuarios
-
 const bcrypt = require('bcryptjs');
 const userRepository = require('../repositories/user.repository');
 
-
 class UserService {
-  async register({ name, email, password }) {
+  async register({ nombres, apellidos, carnet, fechaNacimiento, telefono, email, password }) {
     const hashedPassword = await bcrypt.hash(password, 10);
-    return await userRepository.create({ name, email, password: hashedPassword });
+    return await userRepository.create({
+      nombres,
+      apellidos,
+      carnet,
+      fechaNacimiento,
+      telefono,
+      email,
+      password: hashedPassword
+    });
   }
 
-  async findByEmail(email) {
-    return await userRepository.findByEmail(email);
+  async findByCarnet(carnet) {
+    return await userRepository.findByCarnet(carnet);
   }
 
   async list() {

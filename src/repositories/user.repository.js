@@ -1,8 +1,5 @@
 // src/repositories/user.repository.js
-// Abstracción del acceso a datos para usuarios
-
 const User = require('../models/user.model');
-
 
 class UserRepository {
   async create(userData) {
@@ -10,8 +7,8 @@ class UserRepository {
     return await user.save();
   }
 
-  async findByEmail(email) {
-    return await User.findOne({ email }).select('+password');
+  async findByCarnet(carnet) {
+    return await User.findOne({ carnet }).select('+password');
   }
 
   async findAll() {

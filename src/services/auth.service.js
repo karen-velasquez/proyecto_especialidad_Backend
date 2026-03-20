@@ -1,13 +1,11 @@
 // src/services/auth.service.js
-// Lógica de negocio para autenticación
-
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const userService = require('./user.service');
 
 class AuthService {
-  async login({ email, password }) {
-    const user = await userService.findByEmail(email);
+  async login({ carnet, password }) {
+    const user = await userService.findByCarnet(carnet);
     if (!user) {
       throw new Error('Usuario no encontrado');
     }
@@ -16,10 +14,7 @@ class AuthService {
       throw new Error('Contraseña incorrecta');
     }
     const token = jwt.sign(
-      {
-        id: user._id,
-        email: user.email
-      },
+      { id: user._id, carnet: user.carnet },
       process.env.JWT_SECRET || 'secreto_desarrollo',
       { expiresIn: '1d' }
     );
