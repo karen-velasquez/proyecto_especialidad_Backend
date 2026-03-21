@@ -14,6 +14,10 @@ class UserRepository {
   async findAll() {
     return await User.find();
   }
+
+  async updateById(id, data) {
+    return await User.findByIdAndUpdate(id, data, { new: true, runValidators: true });
+  }
 }
 
 module.exports = new UserRepository();

@@ -23,6 +23,10 @@ class UserService {
   async list() {
     return await userRepository.findAll();
   }
+
+  async update(id, { nombres, apellidos, fechaNacimiento, telefono, email }) {
+    return await userRepository.updateById(id, { nombres, apellidos, fechaNacimiento, telefono, email });
+  }
 }
 
 module.exports = new UserService();
