@@ -25,7 +25,13 @@ class DogRepository {
     return await Dog.find({ owner: ownerId }).populate('owner');
   }
 
-  // Otros métodos de acceso a datos pueden agregarse aquí
+  async findByBreedWithMinConfidence(raza, minConfianza = 0.6) {
+    return await Dog.find({
+      razasDetectadas: {
+        $elemMatch: { raza: raza, confianza: { $gte: minConfianza } }
+      }
+    }).populate('owner', 'nombres apellidos carnet');
+  }
 }
 
 module.exports = new DogRepository();

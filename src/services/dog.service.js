@@ -4,8 +4,8 @@
 const dogRepository = require('../repositories/dog.repository');
 
 class DogService {
-  async register({ nombre, genero, edadAnios, edadMeses, raza, esterilizado, codigoEsterilizacion, owner, foto }) {
-    return await dogRepository.create({ nombre, genero, edadAnios, edadMeses, raza, esterilizado, codigoEsterilizacion, owner, foto });
+  async register({ nombre, genero, edadAnios, edadMeses, raza, esterilizado, codigoEsterilizacion, owner, foto, razasDetectadas }) {
+    return await dogRepository.create({ nombre, genero, edadAnios, edadMeses, raza, esterilizado, codigoEsterilizacion, owner, foto, razasDetectadas });
   }
 
   async list() {
@@ -18,6 +18,10 @@ class DogService {
 
   async listByOwner(ownerId) {
     return await dogRepository.findByOwner(ownerId);
+  }
+
+  async searchByBreed(raza, minConfianza = 0.6) {
+    return await dogRepository.findByBreedWithMinConfidence(raza, minConfianza);
   }
 }
 

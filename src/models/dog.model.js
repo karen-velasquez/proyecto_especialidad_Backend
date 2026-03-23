@@ -58,6 +58,10 @@ const dogSchema = new mongoose.Schema({
   },
   biometricPatterns: [{
     type: String
+  }],
+  razasDetectadas: [{
+    raza: { type: String },
+    confianza: { type: Number }
   }]
 }, {
   timestamps: true
