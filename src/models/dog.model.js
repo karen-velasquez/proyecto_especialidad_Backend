@@ -52,6 +52,10 @@ const dogSchema = new mongoose.Schema({
     ref: "User",
     required: true
   },
+  foto: {
+    type: String,
+    default: null
+  },
   biometricPatterns: [{
     type: String
   }]

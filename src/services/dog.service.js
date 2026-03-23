@@ -4,8 +4,8 @@
 const dogRepository = require('../repositories/dog.repository');
 
 class DogService {
-  async register({ nombre, genero, edadAnios, edadMeses, raza, esterilizado, codigoEsterilizacion, owner }) {
-    return await dogRepository.create({ nombre, genero, edadAnios, edadMeses, raza, esterilizado, codigoEsterilizacion, owner });
+  async register({ nombre, genero, edadAnios, edadMeses, raza, esterilizado, codigoEsterilizacion, owner, foto }) {
+    return await dogRepository.create({ nombre, genero, edadAnios, edadMeses, raza, esterilizado, codigoEsterilizacion, owner, foto });
   }
 
   async list() {
