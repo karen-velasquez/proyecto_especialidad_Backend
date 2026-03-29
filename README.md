@@ -1,369 +1,361 @@
-# 🐶 Dog Nose Biometric Identification API
+# Dog Biometric API
+
+API REST desarrollada con **Node.js y Express** para el sistema de identificación biométrica de perros. Gestiona la autenticación de usuarios, el registro de mascotas y el almacenamiento de imágenes en la nube.
+
+---
+
+## Tabla de Contenidos
+
+- [Descripción](#descripción)
+- [Tecnologías](#tecnologías)
+- [Arquitectura](#arquitectura)
+- [Estructura del Proyecto](#estructura-del-proyecto)
+- [Requisitos Previos](#requisitos-previos)
+- [Instalación y Ejecución](#instalación-y-ejecución)
+- [Variables de Entorno](#variables-de-entorno)
+- [Endpoints de la API](#endpoints-de-la-api)
+- [Modelos de Datos](#modelos-de-datos)
+
+---
 
 ## Descripción
 
-Este proyecto consiste en el desarrollo de un **backend para un sistema de identificación biométrica de perros mediante la huella nasal**.  
-El sistema permite registrar usuarios, registrar perros, capturar imágenes de la nariz del animal y realizar procesos de identificación biométrica utilizando algoritmos de procesamiento de imágenes.
+**Dog Biometric API** es el backend del sistema de identificación biométrica de mascotas. Provee una API REST que permite:
 
-La aplicación forma parte de un sistema **Full Stack**, donde una aplicación móvil desarrollada en **Flutter** se comunica con este backend mediante una **API REST**.
+- Registro y autenticación de propietarios con JWT.
+- Registro de perros con foto subida a Cloudinary.
+- Consulta y búsqueda de perros por raza.
+- Gestión del perfil del usuario.
 
----
-
-# Objetivo general
-
-Desarrollar una **API REST** que permita gestionar usuarios, registrar perros y procesar imágenes biométricas de la nariz para su posterior identificación.
+Se comunica con la aplicación móvil Flutter (`dog_biometric_frontend`) y utiliza MongoDB como base de datos.
 
 ---
 
-# Objetivos específicos
+## Tecnologías
 
-- Implementar una API REST utilizando **Node.js y Express**.
-- Gestionar la autenticación de usuarios mediante **JWT**.
-- Permitir el registro y consulta de perros dentro del sistema.
-- Integrar un servicio de procesamiento biométrico desarrollado en **Python**.
-- Almacenar los registros biométricos y datos del sistema en una base de datos.
-
----
-
-# Alcance
-
-## Incluye
-
-- Registro de usuarios
-- Autenticación mediante JWT
-- Registro de perros
-- Captura y almacenamiento de imágenes biométricas
-- Identificación biométrica mediante procesamiento de imágenes
-- Integración con backend y base de datos
-
-## No incluye (por ahora)
-
-- Integración con sistemas institucionales externos
-- Notificaciones automáticas
-- Escalabilidad para producción
-- Integración con hardware biométrico especializado
+| Tecnología | Versión | Uso |
+|---|---|---|
+| Node.js | ≥18.x | Runtime JavaScript |
+| Express | 5.2.1 | Framework web |
+| MongoDB | — | Base de datos |
+| Mongoose | 9.3.0 | ODM para MongoDB |
+| JSON Web Token | 9.0.3 | Autenticación |
+| bcryptjs | 3.0.3 | Hash de contraseñas |
+| Cloudinary | 1.41.3 | Almacenamiento de imágenes |
+| Multer | 2.1.1 | Manejo de archivos multipart |
+| dotenv | 17.3.1 | Variables de entorno |
+| nodemon | 3.1.14 | Recarga automática en desarrollo |
 
 ---
 
-# Stack Tecnológico
+## Arquitectura
 
-### Backend
-
-- Node.js
-- Express
-
-### Servicio biométrico
-
-- Python
-- OpenCV
-- PyTorch
-
-### Base de datos
-
-- MongoDB
-
-### Cliente
-
-- Flutter (Aplicación móvil)
-
-### Seguridad
-
-- JWT (JSON Web Token)
-
-### Testing
-
-- Postman
-
-### Control de versiones
-
-- Git
-- GitHub
-
----
-
-# Arquitectura del Sistema
+El proyecto sigue principios de **Clean Architecture** con separación clara de capas:
 
 ```
-Flutter Mobile App
-        │
-        │ HTTPS / REST API
-        ▼
-Node.js + Express API
-        │
-        ├── MongoDB Database
-        │
-        └── Python Biometric Service
-              (OpenCV / PyTorch)
-```
-
-
-# Clean Architecture
-
-El proyecto busca alinearse con los principios de **Clean Architecture** para lograr una separación clara de responsabilidades y facilitar la escalabilidad y el mantenimiento. La estructura propuesta es:
-
-```
-src/
-  controllers/   # Adaptadores de entrada/salida (HTTP, Express)
-  routes/        # Definición de endpoints y rutas
-  services/      # Casos de uso y lógica de negocio
-  models/        # Entidades y modelos de dominio
-  repositories/  # Interfaces y acceso a datos (MongoDB, etc.)
-  middlewares/   # Middlewares de Express
-  config/        # Configuración de la app
-```
-
-**Principios clave:**
-- Los controladores solo orquestan la petición y delegan la lógica a los servicios/casos de uso.
-- Los servicios contienen la lógica de negocio y no dependen de Express ni de la base de datos.
-- Los modelos representan las entidades del dominio.
-- Los repositorios abstraen el acceso a datos y pueden tener distintas implementaciones.
-
-Esta arquitectura permite desacoplar la lógica de negocio de la infraestructura y facilita la realización de pruebas, cambios tecnológicos y escalabilidad.
-
-# Entidades principales
-
-## Users
-
-```
-id
-name
-email
-passwordHash
-role
-createdAt
-```
-
-## Dogs
-
-```
-id
-name
-breed
-age
-ownerId
-createdAt
-```
-
-## BiometricRecords
-
-```
-id
-dogId
-imagePath
-biometricPattern
-createdAt
+┌──────────────────────────────────────────┐
+│          Flutter Mobile App              │
+└─────────────────┬────────────────────────┘
+                  │ HTTP REST (puerto 3000)
+┌─────────────────▼────────────────────────┐
+│           Routes (Express)               │
+│  /api/auth   /api/users   /api/dogs      │
+├──────────────────────────────────────────┤
+│              Controllers                  │
+│  (Manejan req/res, delegan a servicios)  │
+├──────────────────────────────────────────┤
+│               Services                   │
+│      (Lógica de negocio)                 │
+├──────────────────────────────────────────┤
+│             Repositories                 │
+│      (Acceso a datos - Mongoose)         │
+├──────────────────────────────────────────┤
+│               Models                     │
+│      (Esquemas MongoDB)                  │
+└─────────────┬──────────────┬─────────────┘
+              │              │
+         MongoDB         Cloudinary
+         (Local)       (Cloud Storage)
 ```
 
 ---
 
-# Endpoints principales
-
-## Registrar usuario
+## Estructura del Proyecto
 
 ```
-POST /users
-```
-
-Body:
-
-```json
-{
-  "name": "Juan Perez",
-  "email": "juan@email.com",
-  "password": "123456"
-}
-```
-
----
-
-## Login de usuario
-
-```
-POST /auth/login
-```
-
-Body:
-
-```json
-{
-  "email": "juan@email.com",
-  "password": "123456"
-}
-```
-
-Respuesta:
-
-```json
-{
-  "token": "JWT_TOKEN"
-}
-```
-
----
-
-## Registrar perro
-
-```
-POST /dogs
-```
-
-Body:
-
-```json
-{
-  "name": "Max",
-  "breed": "Labrador",
-  "age": 3
-}
-```
-
----
-
-## Listar perros
-
-```
-GET /dogs
-```
-
-Respuesta:
-
-```json
-[
-  {
-    "id": 1,
-    "name": "Max",
-    "breed": "Labrador",
-    "age": 3
-  }
-]
-```
-
----
-
-## Registrar imagen biométrica
-
-```
-POST /biometric-records
-```
-
-Body:
-
-```
-image: archivo de imagen
-dogId: identificador del perro
-```
-
----
-
-## Identificar perro
-
-```
-POST /identify
-```
-
-Body:
-
-```
-image: archivo de imagen
-```
-
-Resultado:
-
-```json
-{
-  "dogId": 1,
-  "match": true,
-  "confidence": 0.92
-}
-```
-
----
-
-# Estructura del Proyecto Backend
-
-```
-backend/
-│
+dog_biometric_api/
 ├── src/
-│
-│   ├── app.js
-│   ├── server.js
-│
-│   ├── routes/
-│   │   ├── auth.routes.js
-│   │   ├── dog.routes.js
-│   │   └── biometric.routes.js
-│
+│   ├── server.js                  # Punto de entrada del servidor
+│   ├── app.js                     # Configuración de Express
+│   │
+│   ├── config/
+│   │   └── cloudinary.js          # Configuración de Cloudinary + Multer
+│   │
 │   ├── controllers/
-│   │   ├── auth.controller.js
-│   │   ├── dog.controller.js
-│   │   └── biometric.controller.js
-│
+│   │   ├── auth.controller.js     # Controlador de autenticación
+│   │   ├── auth.middleware.js     # Middleware JWT (verificación de token)
+│   │   ├── dog.controller.js      # Controlador de perros
+│   │   └── user.controller.js     # Controlador de usuarios
+│   │
+│   ├── routes/
+│   │   ├── auth.routes.js         # POST /api/auth/login
+│   │   ├── dog.routes.js          # CRUD /api/dogs
+│   │   └── user.routes.js         # CRUD /api/users
+│   │
 │   ├── services/
-│   │   ├── auth.service.js
-│   │   ├── dog.service.js
-│   │   └── biometric.service.js
-│
+│   │   ├── auth.service.js        # Lógica de login y JWT
+│   │   ├── dog.service.js         # Lógica de negocio de perros
+│   │   └── user.service.js        # Lógica de negocio de usuarios
+│   │
 │   ├── models/
-│   │   ├── user.model.js
-│   │   ├── dog.model.js
-│   │   └── biometric.model.js
+│   │   ├── user.model.js          # Esquema Mongoose de Usuario
+│   │   └── dog.model.js           # Esquema Mongoose de Perro
+│   │
+│   ├── repositories/
+│   │   ├── user.repository.js     # Queries MongoDB de usuarios
+│   │   └── dog.repository.js      # Queries MongoDB de perros
+│   │
+│   └── db/
+│       └── index.js               # Conexión a MongoDB
 │
-│   ├── middlewares/
-│   │   └── auth.js
-│
-│   └── config/
-│       └── env.js
-│
-├── tests/
-├── .env.example
+├── .env                           # Variables de entorno (NO subir al repo)
+├── .env.example                   # Plantilla de variables de entorno
+├── .gitignore
 ├── package.json
 └── README.md
 ```
 
 ---
 
-# Cómo ejecutar el proyecto
+## Requisitos Previos
 
-## 1 Clonar repositorio
+Antes de ejecutar el backend, asegúrate de tener instalado:
 
+1. **Node.js** ≥ 18.x — [nodejs.org](https://nodejs.org)
+   ```bash
+   node -v   # Verificar versión
+   ```
+
+2. **MongoDB** instalado y corriendo localmente
+   - [Instalación de MongoDB Community](https://www.mongodb.com/try/download/community)
+   - Iniciar servicio: `mongod` (Linux/Mac) o desde Servicios de Windows
+
+3. **Cuenta de Cloudinary** (gratuita)
+   - Registrarse en [cloudinary.com](https://cloudinary.com)
+   - Obtener: Cloud Name, API Key, API Secret
+
+---
+
+## Instalación y Ejecución
+
+### Paso 1: Clonar el repositorio
+
+```bash
+git clone <URL_DEL_REPOSITORIO>
+cd FRONTEND/dog_biometric_api
 ```
-git clone https://github.com/usuario/dog-biometric-api
-```
 
-## 2 Instalar dependencias
+### Paso 2: Instalar dependencias
 
-```
+```bash
 npm install
 ```
 
-## 3 Configurar variables de entorno
+### Paso 3: Configurar variables de entorno
 
-Crear archivo `.env`
+Copia el archivo de ejemplo y completa con tus credenciales:
 
+```bash
+cp .env.example .env
 ```
+
+Edita el archivo `.env`:
+
+```env
 PORT=3000
-MONGODB_URI=mongodb://localhost:27017/dog_biometrics
-JWT_SECRET=secret_key
+MONGO_URI=mongodb://localhost:27017/dog_biometric
+JWT_SECRET=tu_clave_secreta_aqui
+
+CLOUDINARY_CLOUD_NAME=tu_cloud_name
+CLOUDINARY_API_KEY=tu_api_key
+CLOUDINARY_API_SECRET=tu_api_secret
 ```
 
-## 4 Ejecutar servidor
+### Paso 4: Verificar que MongoDB esté corriendo
 
+```bash
+# Linux/Mac
+sudo systemctl start mongod
+
+# Windows (en PowerShell como Administrador)
+net start MongoDB
 ```
+
+### Paso 5: Ejecutar el servidor
+
+```bash
+# Modo desarrollo (con recarga automática)
 npm run dev
+
+# El servidor estará disponible en:
+# http://localhost:3000
+```
+
+Deberías ver en la consola:
+```
+Server running on port 3000
+Connected to MongoDB
 ```
 
 ---
 
-# Pruebas de la API
+## Variables de Entorno
 
-Se pueden probar los endpoints utilizando:
+| Variable | Descripción | Ejemplo |
+|---|---|---|
+| `PORT` | Puerto del servidor | `3000` |
+| `MONGO_URI` | URL de conexión a MongoDB | `mongodb://localhost:27017/dog_biometric` |
+| `JWT_SECRET` | Clave secreta para firmar tokens JWT | `mi_clave_super_secreta` |
+| `CLOUDINARY_CLOUD_NAME` | Nombre del cloud de Cloudinary | `mi_cloud` |
+| `CLOUDINARY_API_KEY` | API Key de Cloudinary | `123456789` |
+| `CLOUDINARY_API_SECRET` | API Secret de Cloudinary | `abc123xyz` |
 
-- Postman
-- Insomnia
+> **Importante:** Nunca subas el archivo `.env` al repositorio. Ya está incluido en `.gitignore`.
 
 ---
 
-# Autor
+## Endpoints de la API
 
-Proyecto desarrollado como parte de la **Maestría en Desarrollo Full Stack**.
+La URL base del servidor es: `http://localhost:3000`
+
+### Autenticación
+
+| Método | Endpoint | Descripción | Auth |
+|---|---|---|---|
+| `POST` | `/api/auth/login` | Iniciar sesión, retorna JWT | No |
+
+**Body de login:**
+```json
+{
+  "carnet": "1234567",
+  "password": "mi_contraseña"
+}
+```
+
+**Respuesta exitosa:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": { "id": "...", "nombres": "Juan", "email": "..." }
+}
+```
+
+---
+
+### Usuarios
+
+| Método | Endpoint | Descripción | Auth |
+|---|---|---|---|
+| `POST` | `/api/users` | Registrar nuevo usuario | No |
+| `GET` | `/api/users/me` | Obtener perfil del usuario actual | JWT |
+| `PUT` | `/api/users/me` | Actualizar perfil del usuario | JWT |
+
+**Body para registrar usuario:**
+```json
+{
+  "nombres": "Juan",
+  "apellidos": "Pérez",
+  "carnet": "1234567",
+  "fechaNacimiento": "1990-05-15",
+  "telefono": "+59170000000",
+  "email": "juan@email.com",
+  "password": "mi_contraseña"
+}
+```
+
+---
+
+### Perros
+
+| Método | Endpoint | Descripción | Auth |
+|---|---|---|---|
+| `POST` | `/api/dogs` | Registrar perro (con foto) | JWT |
+| `GET` | `/api/dogs` | Listar perros del usuario | JWT |
+| `GET` | `/api/dogs/search-by-breed` | Buscar perros por raza | JWT |
+
+**Registrar perro** — `multipart/form-data`:
+
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `nombre` | String | Nombre del perro |
+| `genero` | String | `macho` o `hembra` |
+| `edadAnios` | Number | Años de edad |
+| `edadMeses` | Number | Meses adicionales (0-11) |
+| `raza` | String | Raza del perro |
+| `esterilizado` | Boolean | Si está esterilizado |
+| `codigoEsterilizacion` | String | Código de certificado (opcional) |
+| `foto` | File | Imagen del perro |
+| `razasDetectadas` | JSON String | Array de razas detectadas por ML |
+
+**Buscar por raza:**
+```
+GET /api/dogs/search-by-breed?raza=Labrador%20Retriever
+```
+
+> **Autenticación:** Para endpoints protegidos, incluir el header:
+> ```
+> Authorization: Bearer <TOKEN_JWT>
+> ```
+
+---
+
+## Modelos de Datos
+
+### Usuario (User)
+
+```
+nombres           String    Requerido
+apellidos         String    Requerido
+carnet            String    Único, requerido
+fechaNacimiento   Date      Requerido
+telefono          String    Requerido
+email             String    Único, opcional
+password          String    Requerido (almacenado con hash bcrypt)
+role              String    Default: "user"
+createdAt         Date      Auto
+updatedAt         Date      Auto
+```
+
+### Perro (Dog)
+
+```
+nombre                String    Requerido
+genero                String    "macho" | "hembra"
+edadAnios             Number    Default: 0
+edadMeses             Number    0-11, Default: 0
+raza                  String    Enum de 36 razas
+esterilizado          Boolean   Requerido
+codigoEsterilizacion  String    Opcional
+owner                 ObjectId  Referencia al Usuario
+foto                  String    URL de Cloudinary
+biometricPatterns     [String]  Patrones biométricos
+razasDetectadas       [{raza, confianza}]  Razas detectadas por ML
+createdAt             Date      Auto
+updatedAt             Date      Auto
+```
+
+---
+
+## Pruebas de la API
+
+Se puede probar con **Postman** o **Insomnia**. Pasos básicos:
+
+1. Crear usuario: `POST /api/users`
+2. Hacer login: `POST /api/auth/login` → copiar token
+3. Usar el token en el header `Authorization: Bearer <token>` para el resto de requests
+
+---
+
+## Autor
+
+Proyecto de fin de especialidad — Sistema de Identificación Biométrica de Mascotas.
