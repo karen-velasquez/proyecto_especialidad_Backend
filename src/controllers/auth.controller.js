@@ -1,9 +1,24 @@
-const userService = require("../services/user.service");
-const jwt = require("jsonwebtoken");
+/**
+ * controllers/auth.controller.js
+ *
+ * Controlador de autenticación.
+ * Maneja las peticiones HTTP de registro e inicio de sesión.
+ * Delega la lógica de negocio a los servicios correspondientes.
+ */
 
+const userService = require("../services/user.service");
 const authService = require("../services/auth.service");
 
-// 🔐 REGISTRO
+/**
+ * Registra un nuevo usuario en el sistema.
+ *
+ * Recibe del body: nombres, apellidos, carnet, fechaNacimiento, telefono, email, password
+ * Responde con un mensaje de confirmación o un error descriptivo.
+ *
+ * Manejo especial del error 11000 (clave duplicada de MongoDB):
+ *   - Si el campo duplicado es "carnet", informa que el carnet ya está registrado.
+ *   - Si el campo duplicado es "email", informa que el correo ya está registrado.
+ */
 const register = async (req, res) => {
   try {
     const { nombres, apellidos, carnet, fechaNacimiento, telefono, email, password } = req.body;
@@ -12,6 +27,7 @@ const register = async (req, res) => {
       message: "Usuario registrado correctamente"
     });
   } catch (error) {
+    // Error de clave única duplicada en MongoDB
     if (error.code === 11000) {
       const field = Object.keys(error.keyPattern || {})[0];
       if (field === 'carnet') {
@@ -26,8 +42,13 @@ const register = async (req, res) => {
   }
 };
 
-
-// 🔑 LOGIN
+/**
+ * Autentica a un usuario con su carnet y contraseña.
+ *
+ * Recibe del body: carnet, password
+ * Responde con el token JWT si las credenciales son correctas,
+ * o con un error 400 si son incorrectas.
+ */
 const login = async (req, res) => {
   try {
     const { carnet, password } = req.body;
@@ -40,7 +61,6 @@ const login = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
-
 
 module.exports = {
   register,

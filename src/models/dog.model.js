@@ -1,5 +1,28 @@
+/**
+ * models/dog.model.js
+ *
+ * Esquema de Mongoose para el modelo de Perro.
+ *
+ * Campos:
+ *   nombre                - Nombre de la mascota (requerido)
+ *   genero                - "macho" o "hembra" (requerido)
+ *   edadAnios             - Años de edad del perro, minimo 0 (por defecto 0)
+ *   edadMeses             - Meses adicionales de edad, entre 0 y 11 (por defecto 0)
+ *   raza                  - Raza del perro, debe ser uno de los valores del arreglo RAZAS (requerido)
+ *   esterilizado          - Indica si el perro está esterilizado (requerido)
+ *   codigoEsterilizacion  - Código del certificado de esterilización (opcional)
+ *   owner                 - Referencia al usuario propietario (requerido)
+ *   foto                  - URL de la imagen almacenada en Cloudinary (opcional)
+ *   biometricPatterns     - Arreglo de patrones biométricos en formato string (reservado para uso futuro)
+ *   razasDetectadas       - Arreglo de razas detectadas por el modelo ML con su nivel de confianza.
+ *                           Permite buscar perros por raza con filtro de confianza mínima.
+ *
+ * timestamps: true agrega automáticamente los campos createdAt y updatedAt.
+ */
+
 const mongoose = require("mongoose");
 
+// Lista de razas válidas que acepta el sistema
 const RAZAS = [
   "Mestizo",
   "Labrador Retriever", "Golden Retriever", "Pastor Alemán", "Bulldog Francés",
@@ -35,7 +58,7 @@ const dogSchema = new mongoose.Schema({
   },
   raza: {
     type: String,
-    enum: RAZAS,
+    enum: RAZAS,  // Valida que la raza sea una de las permitidas
     required: [true, "La raza es obligatoria"]
   },
   esterilizado: {
@@ -45,26 +68,26 @@ const dogSchema = new mongoose.Schema({
   codigoEsterilizacion: {
     type: String,
     trim: true,
-    default: null
+    default: null  // Solo se llena si esterilizado es true
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    ref: "User",  // Referencia al modelo User
     required: true
   },
   foto: {
     type: String,
-    default: null
+    default: null  // URL de Cloudinary, null si no se subió foto
   },
   biometricPatterns: [{
-    type: String
+    type: String  // Patrones biométricos almacenados como strings (uso futuro)
   }],
   razasDetectadas: [{
     raza: { type: String },
-    confianza: { type: Number }
+    confianza: { type: Number }  // Valor entre 0 y 1 que indica la certeza del modelo ML
   }]
 }, {
-  timestamps: true
+  timestamps: true  // Agrega createdAt y updatedAt automaticamente
 });
 
 module.exports = mongoose.model("Dog", dogSchema);
