@@ -16,6 +16,10 @@ const protect = async (req, res, next) => {
       // Obtener usuario del token (sin password)
       req.user = await User.findById(decoded.id).select("-password");
 
+      if (!req.user) {
+        return res.status(401).json({ message: "No autorizado, usuario no existe" });
+      }
+
       next(); // Continuar a la siguiente función (el controlador)
     } catch (error) {
       console.error(error);

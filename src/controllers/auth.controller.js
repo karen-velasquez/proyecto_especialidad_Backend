@@ -12,6 +12,16 @@ const register = async (req, res) => {
       message: "Usuario registrado correctamente"
     });
   } catch (error) {
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern || {})[0];
+      if (field === 'carnet') {
+        return res.status(400).json({ error: 'El carnet de identidad ya está registrado' });
+      }
+      if (field === 'email') {
+        return res.status(400).json({ error: 'El correo electrónico ya está registrado' });
+      }
+      return res.status(400).json({ error: 'Ya existe un usuario con esos datos' });
+    }
     res.status(500).json({ error: error.message });
   }
 };

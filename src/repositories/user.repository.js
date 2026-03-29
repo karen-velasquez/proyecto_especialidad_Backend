@@ -3,6 +3,10 @@ const User = require('../models/user.model');
 
 class UserRepository {
   async create(userData) {
+    // Si email es vacío o undefined, no lo incluimos para que sparse index funcione
+    if (!userData.email) {
+      delete userData.email;
+    }
     const user = new User(userData);
     return await user.save();
   }
@@ -16,6 +20,9 @@ class UserRepository {
   }
 
   async updateById(id, data) {
+    if (!data.email) {
+      delete data.email;
+    }
     return await User.findByIdAndUpdate(id, data, { new: true, runValidators: true });
   }
 }

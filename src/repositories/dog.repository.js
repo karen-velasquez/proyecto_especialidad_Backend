@@ -30,7 +30,7 @@ class DogRepository {
       razasDetectadas: {
         $elemMatch: { raza: raza, confianza: { $gte: minConfianza } }
       }
-    }).populate('owner', 'nombres apellidos carnet');
+    }).populate('owner', 'nombres apellidos carnet telefono email');
   }
 }
 

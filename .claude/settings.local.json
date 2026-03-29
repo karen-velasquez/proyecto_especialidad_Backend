@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(mongosh dog_biometric --eval \"db.dropDatabase\\(\\)\")",
+      "Bash(node -e \"require\\(''dotenv''\\).config\\(\\); console.log\\(''JWT_SECRET cargado:'', process.env.JWT_SECRET\\);\")"
+    ]
+  }
+}
